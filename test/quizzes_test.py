@@ -8,27 +8,27 @@ class QuizzesTest(unittest.TestCase):
     def setUp(self):
         self.ctrl = QuizzesController('quizzes_test.py')
         
-    # adding the quiz (accepts id as integer if we give null it'll break)
+    # This test case aims to expose a crash when adding a quiz with unsupported data type in title parameter.
+    # Expected crash: quizzes_controller.py, line 63
     def test_expose_failure_01(self):
         self.ctrl.add_quiz(None, 'Quiz-Text', datetime.now(), datetime.now())
 
-    # 
+    # This test case aims to expose a crash when passing a value in add_question as parameter 
+    # that cannot be converted to utf-8
+    # Expected crash: quizzes_controller.py, line 78
+    # Expected crash: utils.py, line 11
     def test_expose_failure_02(self):
         self.ctrl.clear_data()
         quiz_id = self.ctrl.add_quiz("Title: Quiz 1", "This is quiz text", datetime(2023, 1, 7, 11, 30, 0), datetime(2023, 11, 10, 19, 30, 0))
-        question_id = self.ctrl.add_question(quiz_id, "hello\uD800world", "This is question text")
-        # answer_id = self.ctrl.add_answer(question_id, "this is the answer", "This is Wr
-        # ong type!")
-        # self.assertEqual(len(answer_id),0,  "There must be zero quizzes.")
+        self.ctrl.add_question(quiz_id, "hello\uD800world", "This is question text")
 
-    #lambda parameter is not serialisable that's why it breaks
-    # data_loader.py", line 21
+    # This test case aims to expose a crash when passing a lambda as parameter which causes a failure as lambda is not serialisable which causes an exception
+    # Exception crash: quizzess_controller.py, line 81
+    # Exception crash: data_loader.py, line 21
     def test_expose_failure_03(self):
-        # with self.assertRaises(Exception):
         quiz_id = self.ctrl.add_quiz("", 'Quiz-Text', datetime.now(), datetime.now())
         self.ctrl.add_question(quiz_id, lambda:"", 'Question-Text')
-
-
+        
 if __name__ == '__main__':
     unittest.main()
 
